@@ -34,7 +34,7 @@ interface TagsResponse {
 
 export const tagsAtom = atom(async () => {
   try {
-    const response = await fetch("http://staffordwilliams.com/tags.json");
+    const response = await fetch("https://staffordwilliams.com/tags.json");
     const data: TagsResponse = await response.json();
     return data.tags;
   } catch (error) {
