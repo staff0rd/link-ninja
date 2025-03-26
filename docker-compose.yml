@@ -11,4 +11,8 @@ services:
       - ./docker/ssl:/usr/local/apache2/ssl
       - ./docker/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
       - ./docker/conf/httpd-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
+      - ./docker/docker-entrypoint.sh:/docker-entrypoint.sh
+    environment:
+      - SERVER_NAME=${SERVER_NAME:-localhost}
+    entrypoint: ["/docker-entrypoint.sh"]
     restart: unless-stopped
