@@ -4,6 +4,10 @@ services:
     image: httpd:latest
     container_name: link-ninja
     ports:
-    - '8082:80'
+      - '8082:80'
+      - '8443:443'
     volumes:
-    - ./dist:/usr/local/apache2/htdocs
+      - ./dist:/usr/local/apache2/htdocs
+      - ./docker/ssl:/usr/local/apache2/ssl
+      - ./docker/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./docker/conf/httpd-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
