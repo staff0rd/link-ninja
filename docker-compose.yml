@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  apache:
+    image: httpd:latest
+    container_name: link-ninja
+    ports:
+    - '8082:80'
+    volumes:
+    - ./dist:/usr/local/apache2/htdocs
