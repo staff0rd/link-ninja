@@ -27,6 +27,9 @@ import {
   tagsAtom,
 } from "./atoms";
 
+const repoPath = REPO_PATH;
+const githubPat = GITHUB_PAT;
+
 export default function Form() {
   const [defaultValues, setDefaultValues] = useAtom(formStateAtom);
   const {
@@ -68,14 +71,11 @@ export default function Form() {
     setSubmitStatus(null);
     try {
       // Get GitHub PAT and repo info from storage
-      const githubPat = await storage.getItem("sync:githubPat");
-      const repoPath = (await storage.getItem("sync:repoPath")) as string;
       const [owner, repo, path] = repoPath.split("/");
 
       if (!githubPat || !repoPath) {
         throw new Error("GitHub configuration not found");
       }
-
       // Format date for filename
       const date = format(data.timestamp, "yyyy-MM-dd");
       const filename = `${date}-${data.slug}.md`;
@@ -104,7 +104,7 @@ ${data.content}`;
           const fileData = await response.json();
           sha = fileData.sha;
         }
-      } catch (error) {
+      } catch {
         console.log("File doesn't exist yet, creating new one");
       }
 
@@ -199,8 +199,7 @@ ${data.content}`;
                   {...field}
                   onChange={(e) => {
                     field.onChange(e.target.value);
-                    setDefaultValues(async (promise) => {
-                      const prev = await promise;
+                    setDefaultValues((prev) => {
                       const newValue = { ...prev, slug: e.target.value };
                       return newValue;
                     });
@@ -230,8 +229,7 @@ ${data.content}`;
                   }}
                   onChange={(_, newValue) => {
                     field.onChange(newValue);
-                    setDefaultValues(async (promise) => {
-                      const prev = await promise;
+                    setDefaultValues((prev) => {
                       return {
                         ...prev,
                         tags: newValue,
@@ -280,8 +278,7 @@ ${data.content}`;
                   {...field}
                   onChange={(e) => {
                     field.onChange(e.target.value);
-                    setDefaultValues(async (promise) => {
-                      const prev = await promise;
+                    setDefaultValues((prev) => {
                       return {
                         ...prev,
                         content: e.target.value,
