@@ -20,15 +20,13 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
 import {
+  authAtom,
   defaultFormState,
   FormData,
   formSchema,
   formStateAtom,
   tagsAtom,
 } from "./atoms";
-
-const repoPath = REPO_PATH;
-const githubPat = GITHUB_PAT;
 
 export default function Form() {
   const [defaultValues, setDefaultValues] = useAtom(formStateAtom);
@@ -51,6 +49,7 @@ export default function Form() {
 
   // Get available tags from the atom
   const availableTags = useAtomValue(tagsAtom);
+  const secret = useAtomValue(authAtom);
   const [inputValue, setInputValue] = useState("");
   const [submitStatus, setSubmitStatus] = useState<{
     type: "success" | "error";
@@ -70,12 +69,6 @@ export default function Form() {
   const onSubmit = async (data: FormData) => {
     setSubmitStatus(null);
     try {
-      // Get GitHub PAT and repo info from storage
-      const [owner, repo, path] = repoPath.split("/");
-
-      if (!githubPat || !repoPath) {
-        throw new Error("GitHub configuration not found");
-      }
       // Format date for filename
       const date = format(data.timestamp, "yyyy-MM-dd");
       const filename = `${date}-${data.slug}.md`;
@@ -88,46 +81,22 @@ tags: [${data.tags.join(", ")}]
 
 ${data.content}`;
 
-      // Get current content to get SHA (if file exists)
-      let sha: string | undefined;
-      try {
-        const response = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}/contents/${path}/${filename}`,
-          {
-            headers: {
-              Authorization: `Bearer ${githubPat}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (response.ok) {
-          const fileData = await response.json();
-          sha = fileData.sha;
-        }
-      } catch {
-        console.log("File doesn't exist yet, creating new one");
-      }
+      // Call Netlify function to push to GitHub
+      const response = await fetch("/.netlify/functions/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-secret": secret || "",
+        },
+        body: JSON.stringify({ filename, content }),
+      });
 
-      // Create/update file in GitHub
-      const response = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/contents/${path}/${filename}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${githubPat}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: `Add ${filename}`,
-            content: btoa(unescape(encodeURIComponent(content))),
-            ...(sha ? { sha } : {}),
-          }),
-        }
-      );
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(`GitHub API error: ${response.statusText}`);
+        throw new Error(result.error || `API error: ${response.statusText}`);
       }
+
       setSubmitStatus({
         type: "success",
         message: `Successfully saved ${filename} to GitHub`,

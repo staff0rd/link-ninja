@@ -22,3 +22,6 @@ dist-ssr
 *.sw?
 .env
 docker/ssl
+
+# Local Netlify folder
+.netlify

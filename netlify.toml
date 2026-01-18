@@ -1,0 +1,7 @@
+[dev]
+  command = "vite"
+  targetPort = 5173
+  framework = "#custom"
+
+[functions]
+  node_bundler = "esbuild"

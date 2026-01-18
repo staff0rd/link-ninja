@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "netlify dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -25,6 +25,8 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@netlify/functions": "^2.8.2",
+    "netlify-cli": "^17.38.0",
     "@eslint/js": "^9.21.0",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.13.13",

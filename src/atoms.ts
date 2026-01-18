@@ -1,6 +1,43 @@
 import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { z } from "zod";
+
+// Auth storage with 1 month expiry
+const AUTH_EXPIRY_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+interface AuthData {
+  secret: string;
+  expiresAt: number;
+}
+
+const authStorage = createJSONStorage<AuthData | null>(() => localStorage);
+const authStorageKey = "link-ninja-auth";
+
+const baseAuthAtom = atomWithStorage<AuthData | null>(
+  authStorageKey,
+  null,
+  authStorage,
+  { getOnInit: true }
+);
+
+export const authAtom = atom(
+  (get) => {
+    const auth = get(baseAuthAtom);
+    if (!auth) return null;
+    if (Date.now() > auth.expiresAt) return null;
+    return auth.secret;
+  },
+  (_get, set, secret: string | null) => {
+    if (secret === null) {
+      set(baseAuthAtom, null);
+    } else {
+      set(baseAuthAtom, {
+        secret,
+        expiresAt: Date.now() + AUTH_EXPIRY_MS,
+      });
+    }
+  }
+);
 
 // Form schema definition for type safety
 export const formSchema = z.object({
