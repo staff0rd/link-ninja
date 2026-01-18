@@ -5,7 +5,7 @@ import Form from "./Form";
 import Login from "./Login";
 
 const theme = createTheme({
-	palette: { mode: "dark" },
+	palette: { mode: "light" },
 });
 
 function App() {
