@@ -35,7 +35,8 @@ export default async (req: Request) => {
 		);
 	}
 
-	const [owner, repo, path] = repoPath.split("/");
+	const [owner, repo, ...pathParts] = repoPath.split("/");
+	const path = pathParts.join("/");
 
 	try {
 		const payload: SubmitPayload = await req.json();
