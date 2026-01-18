@@ -126,7 +126,7 @@ ${data.content}`;
 				component="form"
 				onSubmit={handleSubmit(onSubmit)}
 				noValidate
-				sx={{ maxWidth: 1024, mt: "10vh" }}
+				sx={{ maxWidth: 1024 }}
 			>
 				<Grid container spacing={2}>
 					<Grid size={12}>

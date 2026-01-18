@@ -76,7 +76,8 @@
 				"**/vite.config.ts",
 				"**/vite-env.d.ts",
 				"**/atoms.ts",
-				"**/submit.ts"
+				"**/submit.ts",
+				"**/index.html"
 			],
 			"linter": {
 				"rules": {
